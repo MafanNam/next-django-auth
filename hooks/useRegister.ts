@@ -1,4 +1,4 @@
-import {useRegisterMutation} from "@/lib/features/authApiSlice";
+import {useRegisterMutation} from "@/lib/features/auth/authApiSlice";
 import {FormEvent, useState} from "react";
 import {useToast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";

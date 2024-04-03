@@ -14,6 +14,9 @@ import {
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import Spinner from "@/components/common/Spinner";
+import {Checkbox} from "@/components/ui/checkbox";
+import {ImFacebook, ImGoogle} from "react-icons/im";
+import {continueWithFacebook, continueWithGoogle} from "@/utils";
 
 export default function LoginForm() {
   const {
@@ -23,6 +26,8 @@ export default function LoginForm() {
     onChange,
     isLoading,
   } = useLogin();
+
+  // const [persist, setPersist] = usePersist()
 
   return (
     <Card className="mx-auto max-w-sm">
@@ -56,11 +61,27 @@ export default function LoginForm() {
               </div>
               <Input id="password" name='password' type="password" value={password} onChange={onChange} required/>
             </div>
+
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Checkbox id='persist'/>
+                <label
+                  htmlFor="terms2"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Trust Tgis Device
+                </label>
+              </div>
+            </div>
+
             <Button type="submit" className="w-full">
               {isLoading ? <Spinner size={25}/> : 'Login'}
             </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
+            <Button variant="outline" type='button' className="w-full bg-red-200 dark:bg-red-950" onClick={continueWithGoogle}>
+              <ImGoogle className='mr-3'/>Login with Google
+            </Button>
+            <Button variant="outline" type='button' className="w-full bg-blue-200 dark:bg-blue-950" onClick={continueWithFacebook}>
+              <ImFacebook className='mr-3'/>Login with Facebook
             </Button>
           </div>
         </form>

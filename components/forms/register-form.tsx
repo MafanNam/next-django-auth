@@ -15,6 +15,8 @@ import {Label} from "@/components/ui/label"
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import Spinner from "@/components/common/Spinner";
 import useRegister from "@/hooks/useRegister";
+import {continueWithFacebook, continueWithGoogle} from "@/utils";
+import {ImFacebook, ImGoogle} from "react-icons/im";
 
 
 export default function RegisterForm() {
@@ -88,8 +90,11 @@ export default function RegisterForm() {
           <Button type="submit" className="w-full">
             {isLoading ? <Spinner size={25}/> : 'Create an account'}
           </Button>
-          <Button variant="outline" className="w-full">
-            Sign up with Google
+          <Button variant="outline" type='button' className="w-full bg-red-200 dark:bg-red-950" onClick={continueWithGoogle}>
+            <ImGoogle className='mr-3'/>Login with Google
+          </Button>
+          <Button variant="outline" type='button' className="w-full bg-blue-200 dark:bg-blue-950" onClick={continueWithFacebook}>
+            <ImFacebook className='mr-3'/>Login with Facebook
           </Button>
         </div>
         </form>

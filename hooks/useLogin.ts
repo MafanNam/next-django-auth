@@ -1,7 +1,9 @@
-import {useLoginMutation} from "@/lib/features/authApiSlice";
+import {useLoginMutation} from "@/lib/features/auth/authApiSlice";
 import {FormEvent, useState} from "react";
 import {useToast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";
+import {setAuth} from "@/lib/features/auth/authSlice";
+import {useAppDispatch} from "@/lib/hooks";
 
 
 export default function useLogin() {
@@ -14,6 +16,7 @@ export default function useLogin() {
 
   const {toast} = useToast()
   const router = useRouter()
+  const dispatch = useAppDispatch()
 
   const {email, password} = formData;
 
@@ -28,6 +31,8 @@ export default function useLogin() {
     login({email, password})
       .unwrap()
       .then(() => {
+        dispatch(setAuth())
+
         toast({
           description: "Login successfully.",
         })

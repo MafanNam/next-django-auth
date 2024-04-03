@@ -1,28 +1,36 @@
-import {fetchBaseQuery, createApi, EndpointBuilder} from '@reduxjs/toolkit/query/react'
+import {fetchBaseQuery, createApi} from '@reduxjs/toolkit/query/react'
 import type {
   BaseQueryFn,
   FetchArgs,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query'
-import { setAuth, logout } from '@/lib/features/authSlice'
-import { Mutex } from 'async-mutex'
+import {setAuth, logout} from '@/lib/features/auth/authSlice'
+import {Mutex} from 'async-mutex'
 
 
 const mutex = new Mutex()
 const baseQuery = fetchBaseQuery({
   baseUrl: `${process.env.NEXT_PUBLIC_HOST}/api/v1`,
-  credentials: 'same-origin',
+  credentials: 'include',
+  // prepareHeaders: (headers, {getState}) => {
+  //   // @ts-ignore
+  //   const token = getState().auth.token;
+  //   if (token) {
+  //     headers.set('Authorization', `Bearer ${token}`);
+  //   }
+  // }
 })
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  // wait until the mutex is available without locking it
   await mutex.waitForUnlock()
+
   let result = await baseQuery(args, api, extraOptions)
+  console.log(result)
+
   if (result.error && result.error.status === 401) {
-    // checking whether the mutex is locked
     if (!mutex.isLocked()) {
       const release = await mutex.acquire()
       try {
@@ -32,26 +40,27 @@ const baseQueryWithReauth: BaseQueryFn<
             method: 'POST',
           },
           api,
-          extraOptions
-        )
+          extraOptions,
+        );
         if (refreshResult.data) {
-          api.dispatch(setAuth());
-          // retry the initial query
+          api.dispatch(setAuth())
+
           result = await baseQuery(args, api, extraOptions)
         } else {
           api.dispatch(logout())
         }
+      } catch (e) {
+        console.log(e);
       } finally {
-        // release must be called once the mutex should be released again.
         release()
       }
     } else {
-      // wait until the mutex is available without locking it
       await mutex.waitForUnlock()
       result = await baseQuery(args, api, extraOptions)
     }
   }
-  return result
+
+  return result;
 }
 
 
@@ -59,4 +68,7 @@ export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   endpoints: builder => ({}),
-})
+});
+
+
+

@@ -1,4 +1,5 @@
 import {apiSlice} from "@/lib/services/apiSlice";
+import {logout, setUser} from "@/lib/features/auth/authSlice";
 
 interface User {
   first_name: string;
@@ -23,7 +24,22 @@ interface CreateUserResponse {
 const authApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     retrieveUser: builder.query<User, void>({
-      query: () => '/users/me/'
+      query: () => '/auth/users/me/',
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+        try {
+          const {data} = await queryFulfilled
+          dispatch(setUser(data))
+        } catch (err) {
+          console.log(err)
+        }
+      },
+    }),
+    updateUser: builder.mutation<User, void>({
+      query: (data) => ({
+        url: '/auth/users/me/',
+        method: 'PUT',
+        body: data,
+      }),
     }),
     socialAuthenticate: builder.mutation<
       CreateUserResponse,
@@ -72,7 +88,7 @@ const authApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     resetPassword: builder.mutation({
-      query: (email) => ({
+      query: email => ({
         url: '/auth/users/reset_password/',
         method: 'POST',
         body: {email},
@@ -90,6 +106,7 @@ const authApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useRetrieveUserQuery,
+  useUpdateUserMutation,
   useSocialAuthenticateMutation,
   useLoginMutation,
   useRegisterMutation,

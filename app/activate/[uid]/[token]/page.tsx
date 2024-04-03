@@ -1,5 +1,5 @@
 "use client";
-import {useActivationMutation} from "@/lib/features/authApiSlice";
+import {useActivationMutation} from "@/lib/features/auth/authApiSlice";
 import {useEffect} from "react";
 import {toast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";
